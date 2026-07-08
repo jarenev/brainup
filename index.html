@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BrainrotUp — Апгрейдер брейнротов</title>
+  <meta name="description" content="Апгрейд брейнротов Steal a Brainrot. Депозит и вывод через трейд в игре.">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div id="loading-screen" class="loading-screen">
+    <div class="loader"></div>
+    <p>Загрузка каталога брейнротов...</p>
+  </div>
+
+  <div id="login-screen" class="login-screen" style="display:none">
+    <div class="login-box">
+      <div class="logo logo-lg">
+        <div class="logo-icon">🧠</div>
+        <span>BrainrotUp</span>
+      </div>
+      <h1>Войти через Roblox</h1>
+      <p class="subtitle">Введи свой ник Roblox для входа</p>
+      <div class="input-group">
+        <label>Ник Roblox</label>
+        <input class="input" id="username-input" placeholder="Твой ник..." autocomplete="off">
+      </div>
+      <button class="btn btn-primary btn-lg" id="login-btn">Войти</button>
+    </div>
+  </div>
+
+  <div id="app" style="display:none">
+    <header class="header">
+      <div class="logo">
+        <div class="logo-icon">🧠</div>
+        <span>BrainrotUp</span>
+      </div>
+      <nav class="nav" id="main-nav">
+        <button class="nav-btn active" data-page="upgrade">Апгрейд</button>
+        <button class="nav-btn" data-page="deposit">Депозит</button>
+        <button class="nav-btn" data-page="withdraw">Вывод</button>
+        <button class="nav-btn" data-page="inventory">Инвентарь</button>
+        <button class="nav-btn nav-admin" data-page="admin" id="admin-nav" style="display:none">
+          Админ <span class="nav-badge" id="admin-badge">0</span>
+        </button>
+      </nav>
+      <div class="user-panel">
+        <span class="role-badge" id="role-badge" style="display:none"></span>
+        <span class="user-name" id="user-display"></span>
+        <button class="btn btn-ghost" id="logout-btn">Выйти</button>
+      </div>
+    </header>
+
+    <div class="container">
+
+      <!-- UPGRADE -->
+      <div id="page-upgrade" class="page active">
+        <div class="page-header">
+          <h2>Апгрейд брейнротов</h2>
+          <p>Рискни предметом ради более редкого. Стрелка покажет реальный результат.</p>
+        </div>
+
+        <div class="upgrade-layout">
+          <div class="card card-panel">
+            <div class="card-title">Твой предмет</div>
+            <div class="catalog-grid" id="upgrade-from-grid"></div>
+          </div>
+
+          <div class="card card-wheel">
+            <div class="wheel-container">
+              <div class="wheel" id="wheel">
+                <div class="wheel-labels">
+                  <span class="wl-win">WIN</span>
+                  <span class="wl-lose">LOSE</span>
+                </div>
+              </div>
+              <div class="wheel-arrow-wrap" id="wheel-arrow-wrap">
+                <div class="wheel-arrow" id="wheel-arrow"></div>
+              </div>
+              <div class="wheel-center" id="chance-display">—</div>
+            </div>
+            <p class="chance-sub">Шанс успеха</p>
+            <div class="upgrade-preview" id="upgrade-preview"></div>
+            <div class="upgrade-actions">
+              <button class="btn btn-primary btn-lg btn-glow" id="upgrade-btn" disabled>АПГРЕЙД</button>
+              <button class="btn btn-secondary" id="fast-spin-btn" type="button">⚡ Быстрый прокрут</button>
+            </div>
+          </div>
+
+          <div class="card card-panel">
+            <div class="card-title">Цель</div>
+            <input class="input input-sm" id="upgrade-search" placeholder="Поиск...">
+            <select class="select input-sm" id="mutation-filter" style="margin:8px 0"></select>
+            <div class="filter-group" id="filter-group">
+              <div class="filter-row" id="filter-mult-row"></div>
+              <div class="filter-row" id="filter-chance-row"></div>
+              <button type="button" class="filter-settings-toggle" id="filter-settings-toggle">⚙ Настроить кнопки</button>
+              <div class="filter-settings-panel" id="filter-settings-panel" style="display:none">
+                <label class="filter-settings-label">Множители (x), через запятую</label>
+                <input class="input input-sm" id="filter-mult-input" placeholder="2, 4, 8, 16">
+                <label class="filter-settings-label">Шансы (%), через запятую</label>
+                <input class="input input-sm" id="filter-chance-input" placeholder="35, 55, 75, 0.0000001">
+                <button type="button" class="btn btn-primary btn-sm" id="filter-save-btn">Сохранить</button>
+              </div>
+              <div class="filter-hint" id="filter-hint"></div>
+            </div>
+            <div class="catalog-grid" id="upgrade-to-grid"></div>
+            <div class="pagination" id="target-pagination"></div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:20px">
+          <div class="card-title">История</div>
+          <div class="history-list" id="history-list"></div>
+        </div>
+      </div>
+
+      <!-- DEPOSIT -->
+      <div id="page-deposit" class="page">
+        <div class="page-header">
+          <h2>Депозит</h2>
+          <p>Отправь брейнрота через трейд — админ зачислит на баланс</p>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">Инструкция</div>
+            <div class="steps">
+              <div class="step">
+                <div class="step-num">1</div>
+                <div class="step-text">Добавь бота в <strong>друзья</strong> в Roblox</div>
+              </div>
+              <div class="step">
+                <div class="step-num">2</div>
+                <div class="step-text">Нажми <strong>«Подать заявку»</strong> на депозит</div>
+              </div>
+              <div class="step">
+                <div class="step-num">3</div>
+                <div class="step-text">Зайди в <strong>Steal a Brainrot</strong> — бот зайдёт к тебе в сервер</div>
+              </div>
+              <div class="step">
+                <div class="step-num">4</div>
+                <div class="step-text">Бот кинет <strong>трейд</strong> — положи своего брейнрота и подтверди</div>
+              </div>
+              <div class="step">
+                <div class="step-num">5</div>
+                <div class="step-text">Админ проверит трейд и зачислит брейнрота в твой инвентарь</div>
+              </div>
+            </div>
+            <a class="btn btn-primary" id="join-link" href="#" target="_blank" style="margin-top:16px">Открыть игру</a>
+          </div>
+          <div class="card">
+            <div class="card-title">Заявка на депозит</div>
+            <p class="card-desc">Тебе не нужно выбирать брейнрота — админ сам укажет, какого ты отдал в трейде.</p>
+            <button class="btn btn-primary btn-lg" id="deposit-btn" style="width:100%">Подать заявку</button>
+            <div id="pending-deposits" class="pending-list"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- WITHDRAW -->
+      <div id="page-withdraw" class="page">
+        <div class="page-header">
+          <h2>Вывод</h2>
+          <p>Получи брейнрота обратно в игру через трейд</p>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">Инструкция</div>
+            <div class="steps">
+              <div class="step">
+                <div class="step-num">1</div>
+                <div class="step-text">Выбери предмет и нажми <strong>«Вывести»</strong></div>
+              </div>
+              <div class="step">
+                <div class="step-num">2</div>
+                <div class="step-text">Убедись что <strong>бот в друзьях</strong></div>
+              </div>
+              <div class="step">
+                <div class="step-num">3</div>
+                <div class="step-text">Зайди в игру — бот зайдёт к тебе</div>
+              </div>
+              <div class="step">
+                <div class="step-num">4</div>
+                <div class="step-text">Прими трейд от бота — брейнрот вернётся в твою базу</div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">Вывод предметов</div>
+            <div class="inventory-grid" id="withdraw-list"></div>
+            <div id="pending-withdraws" class="pending-list"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- INVENTORY -->
+      <div id="page-inventory" class="page">
+        <div class="page-header">
+          <h2>Инвентарь</h2>
+          <p id="inventory-count"></p>
+        </div>
+        <div class="card">
+          <div class="inventory-grid" id="inventory-grid"></div>
+        </div>
+      </div>
+
+      <!-- ADMIN -->
+      <div id="page-admin" class="page">
+        <div class="page-header">
+          <h2>Панель администратора</h2>
+          <p>Подтверждай депозиты, выводы и управляй подкруткой</p>
+          <p class="firebase-status" id="firebase-status"></p>
+        </div>
+
+        <div class="card admin-rig-section">
+          <div class="card-title">Прокрутка <span class="count-badge" id="admin-spin-count" style="display:none">0</span></div>
+          <p class="card-desc">Включи режим подкрутки для игрока — ты решаешь Заход/Незаход, у него рулетка стартует с задержкой.</p>
+          <div class="rig-controls">
+            <input class="input" id="rig-username-input" placeholder="Ник игрока Roblox">
+            <button class="btn btn-primary" id="rig-enable-btn">Включить подкрутку</button>
+            <button class="btn btn-danger" id="rig-disable-btn">Выключить</button>
+          </div>
+          <div class="rig-subsection">
+            <div class="rig-subtitle">Игроки с подкруткой</div>
+            <div id="admin-rigged-list" class="admin-list rig-list"></div>
+          </div>
+          <div class="rig-subsection">
+            <div class="rig-subtitle">Ожидают решения</div>
+            <div id="admin-pending-spins" class="admin-list"></div>
+          </div>
+        </div>
+
+        <div class="grid-2" style="margin-top:20px">
+          <div class="card">
+            <div class="card-title">Заявки на депозит <span class="count-badge" id="admin-dep-count">0</span></div>
+            <div id="admin-deposits" class="admin-list"></div>
+          </div>
+          <div class="card">
+            <div class="card-title">Заявки на вывод <span class="count-badge" id="admin-wd-count">0</span></div>
+            <div id="admin-withdraws" class="admin-list"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="result-modal">
+    <div class="modal">
+      <h2 id="result-title">Результат</h2>
+      <div class="result-emoji" id="result-emoji">🎰</div>
+      <p id="result-desc"></p>
+      <button class="btn btn-primary" id="close-modal">Продолжить</button>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/firebase-db.js"></script>
+  <script src="js/brainrots.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
